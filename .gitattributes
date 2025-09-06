@@ -1,2 +1,10 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+Content/Weapons/MilitaryWeapDark/** filter=lfs merge=lfs -text
+
+Content/VisualSandbox/EpicAssets/** filter=lfs merge=lfs -text
+
+Content/MetaHumans/MH_Anims/** filter=lfs merge=lfs -text
+
+Content/CitySampleCrowd/Character/** filter=lfs merge=lfs -text
