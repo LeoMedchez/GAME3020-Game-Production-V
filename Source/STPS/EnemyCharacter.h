@@ -31,6 +31,12 @@ public:
 
 	TArray<FVector> WorldPatrolPoints;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	float Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	float MaxHealth;
+
 	UPROPERTY(EditAnywhere, Category = "AI")
 	TObjectPtr<class UBehaviorTree> BehaviorTree;
 
