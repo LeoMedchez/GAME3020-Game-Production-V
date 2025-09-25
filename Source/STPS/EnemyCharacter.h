@@ -31,6 +31,9 @@ public:
 
 	TArray<FVector> WorldPatrolPoints;
 
+	UPROPERTY(EditAnywhere, Category = "AI")
+	TObjectPtr<class UBehaviorTree> BehaviorTree;
+
 	UFUNCTION(BlueprintCallable)
 	const FVector& GetNextPatrolLocation();
 	

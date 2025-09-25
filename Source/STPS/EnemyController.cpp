@@ -3,25 +3,36 @@
 
 #include "EnemyController.h"
 #include "EnemyCharacter.h"
-#include "NavigationSystem.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
-void AEnemyController::BeginPlay()
+AEnemyController::AEnemyController()
 {
-	Super::BeginPlay();
-	GetWorld()->GetTimerManager().SetTimer(RandomWaypointTimerHandle, this, &AEnemyController::GoToNextPatrolPoint, 3, false);
+	BehaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComp"));
+	check(BehaviorTreeComponent);
+
+	BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComp"));
+	check(BlackboardComponent);
 }
 
-void AEnemyController::GoToNextPatrolPoint()
+void AEnemyController::OnPossess(APawn* InPawn)
 {
-	AEnemyCharacter* ControllingEnemy = Cast<AEnemyCharacter>(GetPawn());
-	if (ControllingEnemy)
+	Super::OnPossess(InPawn);
+	if (InPawn == nullptr)
 	{
-		MoveToLocation(ControllingEnemy->GetNextPatrolLocation());
+		return;
 	}
-}
-
-void AEnemyController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
-{
-	Super::OnMoveCompleted(RequestID, Result);
-	GetWorld()->GetTimerManager().SetTimer(RandomWaypointTimerHandle, this, &AEnemyController::GoToNextPatrolPoint, 3, false);
+	
+	AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(InPawn);
+	if (Enemy)
+	{
+		if (Enemy->BehaviorTree)
+		{
+			if (Enemy->BehaviorTree->BlackboardAsset)
+			{
+				BlackboardComponent->InitializeBlackboard(*(Enemy->BehaviorTree->BlackboardAsset));
+			}
+			BehaviorTreeComponent->StartTree(*(Enemy->BehaviorTree));
+		}
+	}
 }

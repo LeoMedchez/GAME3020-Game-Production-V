@@ -14,14 +14,18 @@ class STPS_API AEnemyController : public AAIController
 {
 	GENERATED_BODY()
 
-	FTimerHandle RandomWaypointTimerHandle;
-
-protected:
-	virtual void BeginPlay() override;
-	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
-
 public:
-	UFUNCTION()
-	void GoToNextPatrolPoint();
+	AEnemyController();
+
+	virtual void OnPossess(APawn* InPawn) override;
+
+	UBlackboardComponent* GetBlackboard() { return BlackboardComponent; }
 	
+protected:
+	
+	UPROPERTY(BlueprintReadWrite, Category = Behavior)
+	TObjectPtr<class UBehaviorTreeComponent> BehaviorTreeComponent;
+	
+	UPROPERTY(BlueprintReadWrite, Category = Behavior)
+	TObjectPtr<class UBlackboardComponent> BlackboardComponent;
 };
