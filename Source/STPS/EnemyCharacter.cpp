@@ -29,23 +29,20 @@ void AEnemyCharacter::Tick(float DeltaTime)
 
 }
 
-const FVector& AEnemyCharacter::GetNextPatrolLocation()
+bool AEnemyCharacter::GetNextPatrolLocation(FVector& Location)
 {
-	if (WorldPatrolPoints.Num() > 0)
+	if (WorldPatrolPoints.Num() == 0)
 	{
-		if (CurrentPatrolIndex >= WorldPatrolPoints.Num())
-		{
-			CurrentPatrolIndex = 0;
-		}
+		return false;
+	}
 
-		return WorldPatrolPoints[CurrentPatrolIndex++];
-	}
-	else
+	if (CurrentPatrolIndex >= WorldPatrolPoints.Num())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, 
-			TEXT("No Patrol Points Set For Enemy Actor"));
-		return FVector::ZeroVector;
+		CurrentPatrolIndex = 0;
 	}
+
+	Location = WorldPatrolPoints[CurrentPatrolIndex++];
+	return true;
 }
 
 // Called to bind functionality to input

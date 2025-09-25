@@ -35,7 +35,7 @@ public:
 	TObjectPtr<class UBehaviorTree> BehaviorTree;
 
 	UFUNCTION(BlueprintCallable)
-	const FVector& GetNextPatrolLocation();
+	bool GetNextPatrolLocation(FVector& Location);
 	
 
 private:
