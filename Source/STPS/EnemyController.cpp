@@ -27,15 +27,15 @@ AEnemyController::AEnemyController()
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(FName("Sight Config"));
 	HearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(FName("Hearing Config"));
 
-	SightConfig->SightRadius = 700.0f;
-	SightConfig->LoseSightRadius = 900.0f;
+	SightConfig->SightRadius = 900.0f;
+	SightConfig->LoseSightRadius = 1100.0f;
 	SightConfig->PeripheralVisionAngleDegrees = 45;
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 
-	HearingConfig->HearingRange = 900.0f;
-	HearingConfig->SetMaxAge(2);
+	HearingConfig->HearingRange = 1000.0f;
+	HearingConfig->SetMaxAge(5);
 	HearingConfig->DetectionByAffiliation.bDetectEnemies = true;
 	HearingConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	HearingConfig->DetectionByAffiliation.bDetectFriendlies = true;
@@ -76,35 +76,47 @@ void AEnemyController::OnPossess(APawn* InPawn)
 
 void AEnemyController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (Actor == nullptr) return;
+	if (!Actor) return;
 
-	if (AMainCharacter* PlayerRef = Cast<AMainCharacter>(Actor))
+	AMainCharacter* PlayerRef = Cast<AMainCharacter>(Actor);
+	if (!PlayerRef) return;
+
+	// Check which sense triggered
+	const FName StimulusSense = Stimulus.Type.Name;
+	if (Stimulus.Type == SightConfig->GetSenseID())
 	{
-		if (Stimulus.Type == SightConfig->GetSenseID())
-		{
-			if (Stimulus.WasSuccessfullySensed())
-			{
-				bCanSeePlayer = true;
-				BlackboardComponent->SetValueAsBool("IsInvestigating", bCanSeePlayer);
-			}
-			else
-			{
-				bCanSeePlayer = false;
-				BlackboardComponent->SetValueAsBool("IsInvestigating", bCanSeePlayer);
-			}
-		}
+		bCanSeePlayer = Stimulus.WasSuccessfullySensed();
 
-		if (Stimulus.Type == HearingConfig->GetSenseID())
+		if (bCanSeePlayer)
 		{
-			if (Stimulus.WasSuccessfullySensed())
-			{
-				bHeardSound = true;
-			}
-			else
-			{
-				bHeardSound = false;
-			}
+			// Track player location
+			BlackboardComponent->SetValueAsVector("SeenPlayerLocation", PlayerRef->GetActorLocation());
+			BlackboardComponent->SetValueAsBool("IsPlayerSeen", bCanSeePlayer);
 		}
+	}
+
+	if (Stimulus.Type == HearingConfig->GetSenseID())
+	{
+		bHeardSound = Stimulus.WasSuccessfullySensed();
+
+		if (bHeardSound)
+		{
+			// Track sound location
+			BlackboardComponent->SetValueAsVector("TargetLocation", Stimulus.StimulusLocation);
+		}
+	}
+
+	// --- Decide if AI should investigate or patrol ---
+	const bool bShouldInvestigate = bCanSeePlayer || bHeardSound;
+
+	BlackboardComponent->SetValueAsBool("IsInvestigating", bShouldInvestigate);
+
+	// --- Cleanup if lost all senses ---
+	if (!bShouldInvestigate)
+	{
+		// Prevents MoveTo from looping on an old position
+		BlackboardComponent->ClearValue("TargetLocation");
+		BlackboardComponent->ClearValue("IsPlayerSeen");
 	}
 }
 
