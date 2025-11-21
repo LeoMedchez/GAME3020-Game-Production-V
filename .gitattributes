@@ -8,3 +8,14 @@ Content/VisualSandbox/EpicAssets/** filter=lfs merge=lfs -text
 Content/MetaHumans/MH_Anims/** filter=lfs merge=lfs -text
 
 Content/CitySampleCrowd/Character/** filter=lfs merge=lfs -text
+
+Content/MOUT_Fabrication/Meshes/** filter=lfs merge=lfs -text
+
+Content/MOUT_Fabrication/Maps/** filter=lfs merge=lfs -text
+
+Content/MOUT_Fabrication/Videos/** filter=lfs merge=lfs -text
+
+Content/MOUT_Fabrication/Demo/** filter=lfs merge=lfs -text
+
+
+
