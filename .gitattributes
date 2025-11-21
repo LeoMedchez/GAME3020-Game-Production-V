@@ -17,5 +17,9 @@ Content/MOUT_Fabrication/Videos/** filter=lfs merge=lfs -text
 
 Content/MOUT_Fabrication/Demo/** filter=lfs merge=lfs -text
 
+Content/MOUT_Fabrication/Textures/** filter=lfs merge=lfs -text
+
+Content/MOUT_Fabrication/Materials/** filter=lfs merge=lfs -text
+
 
 
